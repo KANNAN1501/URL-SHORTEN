@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #d9f7ff, #fef9d7); /* Light gradient background */
+      text-align: center;
+      padding-top: 50px;
+      animation: fadeIn 1.5s ease-in-out; /* Page load animation */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: inline-block;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    #container:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    input[type="text"]:focus {
+      box-shadow: 0 0 8px rgba(0, 150, 255, 0.5);
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: linear-gradient(to right, #ff8c00, #ff6200); /* 3D effect */
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 5px 0px #c75000; /* Button shadow */
+    }
+
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0px #c75000;
+    }
+
+    button:disabled {
+      background: gray;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    #shortenedUrl {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    #shortenedUrl p {
+      background: #e6ffe6;
+      display: inline-block;
+      padding: 10px;
+      border-radius: 5px;
+      animation: popUp 0.5s ease-in-out;
+    }
+
+    @keyframes popUp {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1>URL Shortener</h1>
+    <input type="text" id="originalUrl" placeholder="Enter the original URL">
+    <button id="shortenButton" onclick="shortenUrl()">Shorten</button>
+    <div id="shortenedUrl"></div>
+  </div>
+
+  <script>
+    async function shortenUrl() {
+      const originalUrl = document.getElementById('originalUrl').value;
+      const shortenButton = document.getElementById('shortenButton');
+      const shortenedUrlDiv = document.getElementById('shortenedUrl');
+
+      if (!originalUrl) {
+        alert('Please enter a URL.');
+        return;
+      }
+
+      shortenButton.disabled = true;
+      shortenButton.innerText = "Shortening...";
+
+      try {
+        const response = await fetch('/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ long_url: originalUrl })
+        });
+
+        const text = await response.text();
+
+        if (response.ok) {
+          shortenedUrlDiv.innerHTML = `<p><a href="${text}" target="_blank">${text}</a></p>`;
+        } else {
+          shortenedUrlDiv.innerHTML = `<p style="color: red;">Error: ${text}</p>`;
+        }
+      } catch (error) {
+        shortenedUrlDiv.innerHTML = `<p style="color: red;">An error occurred. Try again.</p>`;
+      }
+
+      shortenButton.disabled = false;
+      shortenButton.innerText = "Shorten";
+    }
+  </script>
+</body>
+</html>
+  
