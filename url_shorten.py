@@ -3,12 +3,29 @@ import mysql.connector
 import hashlib
 import os
 from dotenv import find_dotenv, load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+
 dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
 
+app = Flask(__name__, template_folder="index")
+
+# Database Configuration 
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Ensure DATABASE_URL is loaded
+database_url = os.getenv("DATABASE_URL")
+if not database_url:
+    raise ValueError("DATABASE_URL is not set in the .env file!")
+
+# Set secret key
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 
-# Database Configuration    
+# Initialize database
+db = SQLAlchemy(app)
+
 DB_CONFIG = {
     'host': os.getenv("DB_HOST"),
     'user': os.getenv("DB_USER"),
@@ -16,7 +33,7 @@ DB_CONFIG = {
     'database': os.getenv("DB_NAME")
 }
 
-app = Flask(__name__)
+
 
 # Database Connection
 def get_db_connection():
